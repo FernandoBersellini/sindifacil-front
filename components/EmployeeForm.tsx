@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 import { useCreateEmployee, useUpdateEmployee } from "@/hooks/useEmployeeMutations";
+import { PasswordField } from "@/components/PasswordField";
 import { formatCpf } from "@/lib/format";
 import type { Employee } from "@/types/employee";
 
 function toDateInputValue(date: Date) {
   return new Date(date).toISOString().slice(0, 10);
 }
+
+const inputClass =
+  "rounded-md border border-text/20 bg-background px-3 py-2 text-base focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30";
+const labelClass = "flex flex-col gap-1 text-base font-medium";
 
 // Render with `key={employee?.id ?? "new"}` from the parent so local state
 // resets automatically when switching between create and edit targets.
@@ -57,17 +62,17 @@ export function EmployeeForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
-      <label className="flex flex-col gap-1 text-sm">
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4">
+      <label className={labelClass}>
         Nome
         <input
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
+          className={inputClass}
         />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass}>
         CPF
         <input
           required
@@ -75,12 +80,12 @@ export function EmployeeForm({
           onChange={(e) => setCpf(formatCpf(e.target.value))}
           placeholder="000.000.000-00"
           maxLength={14}
-          className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
+          className={inputClass}
         />
       </label>
       {!employee && (
         <>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className={labelClass}>
             Email
             <input
               required
@@ -88,36 +93,31 @@ export function EmployeeForm({
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
+              className={inputClass}
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            Senha
-            <input
-              required
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
-            />
-          </label>
+          <PasswordField
+            label="Senha"
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+          />
         </>
       )}
-      <label className="flex flex-col gap-1 text-sm">
+      <label className={labelClass}>
         Data de nascimento
         <input
           required
           type="date"
           value={birthDate}
           onChange={(e) => setBirthDate(e.target.value)}
-          className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
+          className={inputClass}
         />
       </label>
       <button
         type="submit"
         disabled={isSaving}
-        className="rounded bg-foreground px-4 py-1.5 text-sm text-background disabled:opacity-50"
+        className="rounded-md bg-secondary px-5 py-2.5 text-base font-semibold text-text transition-colors hover:bg-secondary/70 disabled:opacity-50"
       >
         {employee ? "Salvar" : "Adicionar"}
       </button>
@@ -125,7 +125,7 @@ export function EmployeeForm({
         <button
           type="button"
           onClick={onDone}
-          className="rounded border border-black/15 px-4 py-1.5 text-sm dark:border-white/15"
+          className="rounded-md border border-text/20 px-5 py-2.5 text-base font-medium transition-colors hover:bg-text/10"
         >
           Cancelar
         </button>
