@@ -13,8 +13,8 @@ export function EmployeeTable() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   if (isLoading) return <p className="text-sm opacity-60">Carregando…</p>;
-  if (error) return <p className="text-sm text-red-600">Erro ao carregar funcionários.</p>;
-  if (!employees?.length) return <p className="text-sm opacity-60">Nenhum funcionário cadastrado.</p>;
+  if (error) return <p className="text-sm text-red-600">Erro ao carregar colaboradores.</p>;
+  if (!employees?.length) return <p className="text-sm opacity-60">Nenhum colaborador cadastrado.</p>;
 
   return (
     <table className="w-full text-left text-sm">

@@ -20,6 +20,8 @@ export function EmployeeForm({
 }) {
   const [name, setName] = useState(employee?.name ?? "");
   const [cpf, setCpf] = useState(employee?.cpf ?? "");
+  const [email, setEmail] = useState(employee?.email ?? "");
+  const [password, setPassword] = useState("");
   const [birthDate, setBirthDate] = useState(
     employee ? toDateInputValue(employee.birthDate) : ""
   );
@@ -30,19 +32,27 @@ export function EmployeeForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const data = { name, cpf, birthDate: new Date(`${birthDate}T00:00:00`) };
+    const parsedBirthDate = new Date(`${birthDate}T00:00:00`);
 
     if (employee) {
-      updateEmployee.mutate({ id: employee.id, data }, { onSuccess: onDone });
+      updateEmployee.mutate(
+        { id: employee.id, data: { name, cpf, birthDate: parsedBirthDate } },
+        { onSuccess: onDone }
+      );
     } else {
-      createEmployee.mutate(data, {
-        onSuccess: () => {
-          setName("");
-          setCpf("");
-          setBirthDate("");
-          onDone?.();
-        },
-      });
+      createEmployee.mutate(
+        { name, cpf, email, password, birthDate: parsedBirthDate },
+        {
+          onSuccess: () => {
+            setName("");
+            setCpf("");
+            setEmail("");
+            setPassword("");
+            setBirthDate("");
+            onDone?.();
+          },
+        }
+      );
     }
   }
 
@@ -68,6 +78,32 @@ export function EmployeeForm({
           className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
         />
       </label>
+      {!employee && (
+        <>
+          <label className="flex flex-col gap-1 text-sm">
+            Email
+            <input
+              required
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            Senha
+            <input
+              required
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="rounded border border-black/15 px-2 py-1 text-sm dark:border-white/15"
+            />
+          </label>
+        </>
+      )}
       <label className="flex flex-col gap-1 text-sm">
         Data de nascimento
         <input

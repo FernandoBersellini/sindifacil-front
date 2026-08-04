@@ -1,5 +1,7 @@
+import { clearStoredAuth, getStoredAuth } from "@/lib/auth/token";
+
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5555/api/v1";
 
 export class ApiError extends Error {
   constructor(
@@ -13,10 +15,13 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const auth = getStoredAuth();
+
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
+      ...(auth ? { Authorization: `Bearer ${auth.token}` } : {}),
       ...init?.headers,
     },
   });
@@ -25,7 +30,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const body = isJson ? await res.json() : await res.text();
 
   if (!res.ok) {
-    throw new ApiError(res.statusText, res.status, body);
+    // Only an authenticated request going stale should force a logout —
+    // a 401 from the login call itself just means bad credentials.
+    if (res.status === 401 && auth) {
+      clearStoredAuth();
+      if (typeof window !== "undefined") window.location.href = "/login";
+    }
+
+    const message =
+      (isJson && (body as { message?: string })?.message) || res.statusText;
+    throw new ApiError(message, res.status, body);
   }
 
   return body as T;
