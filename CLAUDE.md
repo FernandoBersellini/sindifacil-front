@@ -61,6 +61,17 @@ DTOs, and auth requirements aren't derivable from this repo alone:
   from an **admin** login (`role: "ADMIN"`); `lib/api/client.ts` does not yet attach any
   auth header. There is no refresh/logout/`/auth/me` endpoint — the frontend must persist
   and decode the login response itself.
+- `docs/associates.md` — the `Associate` resource (digitized union-member "ficha"
+  records). Not yet implemented in this frontend. Key points: uses bare REST verbs on
+  the resource root (`POST/GET /associate`, `GET/PATCH/DELETE /associate/:id`) —
+  singular `associate`, unlike Employees' `/employees/create`-style paths. **No auth
+  guard yet** — routes are public despite `Employees` requiring an admin JWT. No
+  `ValidationPipe`, so `PATCH` will silently accept undeclared fields (e.g.
+  `registrationNumber`, which isn't on `CreateAssociateDto` but is on the entity).
+  `registrationNumber` can't be set on create, only via a follow-up `PATCH`. `birthDate`
+  round-trips as a full ISO timestamp on read even though create takes a plain date
+  string. File-upload metadata fields (`storageKey`, `originalFilename`, `mimeType`,
+  `uploadedAt`) exist on the entity but are always `null` — no upload endpoint exists.
 
 The employee REST paths/DTOs are also summarized in the root `README.md`, but `docs/auth.md`
-is the source of truth for anything auth-related.
+and `docs/associates.md` are the source of truth for their respective resources.

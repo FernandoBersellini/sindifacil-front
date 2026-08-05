@@ -8,19 +8,27 @@ import { ApiError } from "@/lib/api/client";
 import { PasswordField } from "@/components/PasswordField";
 
 export default function LoginPage() {
+  const [mode, setMode] = useState<"employee" | "admin">("employee");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { auth, isReady } = useAuth();
-  const login = useLogin();
+  const login = useLogin(mode);
 
   useEffect(() => {
-    if (isReady && auth) router.replace("/");
+    if (isReady && auth) {
+      router.replace(auth.userRole === "ADMIN" ? "/" : "/associates");
+    }
   }, [isReady, auth, router]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     login.mutate({ email, password });
+  }
+
+  function toggleMode() {
+    setMode((m) => (m === "employee" ? "admin" : "employee"));
+    login.reset();
   }
 
   const errorMessage = login.isError
@@ -32,7 +40,9 @@ export default function LoginPage() {
   return (
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-16">
       <div className="rounded-lg border border-text/10 bg-background p-6 shadow-sm">
-        <h1 className="mb-6 text-2xl font-semibold">Entrar</h1>
+        <h1 className="mb-6 text-2xl font-semibold">
+          {mode === "employee" ? "Entrar" : "Entrar como administrador"}
+        </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-base font-medium">
             Email
@@ -62,6 +72,15 @@ export default function LoginPage() {
             {login.isPending ? "Entrando…" : "Entrar"}
           </button>
         </form>
+        <button
+          type="button"
+          onClick={toggleMode}
+          className="mt-4 w-full text-center text-sm text-text/60 underline-offset-2 hover:text-text/80 hover:underline"
+        >
+          {mode === "employee"
+            ? "Sou administrador"
+            : "Entrar como funcionário"}
+        </button>
       </div>
     </div>
   );
