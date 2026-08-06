@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { AuthGuard } from "@/components/AuthGuard";
 import { EmployeeForm } from "@/components/EmployeeForm";
 import { EmployeeTable } from "@/components/EmployeeTable";
+import { Modal } from "@/components/Modal";
 import { useAuth } from "@/lib/auth/context";
 
 export default function Home() {
   const { auth, logout } = useAuth();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
     <AuthGuard>
@@ -25,15 +28,26 @@ export default function Home() {
         </header>
 
         <section className="rounded-lg border border-text/10 bg-background p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold">Novo colaborador</h2>
-          <EmployeeForm />
-        </section>
-
-        <section className="rounded-lg border border-text/10 bg-background p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold">Colaboradores cadastrados</h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Colaboradores cadastrados</h2>
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="rounded-md bg-secondary px-4 py-2 text-base font-semibold text-text transition-colors hover:bg-secondary/70"
+            >
+              Novo colaborador
+            </button>
+          </div>
           <EmployeeTable />
         </section>
       </div>
+
+      <Modal
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        title="Novo colaborador"
+      >
+        <EmployeeForm onDone={() => setIsCreateOpen(false)} />
+      </Modal>
     </AuthGuard>
   );
 }

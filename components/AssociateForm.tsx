@@ -70,7 +70,7 @@ export function AssociateForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <label className={labelClass}>
         Nome
         <input
@@ -118,22 +118,24 @@ export function AssociateForm({
           />
         </label>
       )}
-      <button
-        type="submit"
-        disabled={isSaving}
-        className="rounded-md bg-secondary px-5 py-2.5 text-base font-semibold text-text transition-colors hover:bg-secondary/70 disabled:opacity-50"
-      >
-        {associate ? "Salvar" : "Adicionar"}
-      </button>
-      {associate && (
+      <div className="mt-2 flex justify-end gap-2">
+        {onDone && (
+          <button
+            type="button"
+            onClick={onDone}
+            className="rounded-md border border-text/20 px-5 py-2.5 text-base font-medium transition-colors hover:bg-text/10"
+          >
+            Cancelar
+          </button>
+        )}
         <button
-          type="button"
-          onClick={onDone}
-          className="rounded-md border border-text/20 px-5 py-2.5 text-base font-medium transition-colors hover:bg-text/10"
+          type="submit"
+          disabled={isSaving}
+          className="rounded-md bg-secondary px-5 py-2.5 text-base font-semibold text-text transition-colors hover:bg-secondary/70 disabled:opacity-50"
         >
-          Cancelar
+          {associate ? "Salvar" : "Adicionar"}
         </button>
-      )}
+      </div>
     </form>
   );
 }

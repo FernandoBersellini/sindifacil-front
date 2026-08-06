@@ -4,13 +4,16 @@ import { useState } from "react";
 import { useAssociates } from "@/hooks/useAssociates";
 import { useRemoveAssociate } from "@/hooks/useAssociateMutations";
 import { AssociateForm } from "@/components/AssociateForm";
+import { Modal } from "@/components/Modal";
 import { formatDateBr } from "@/lib/format";
 import type { Associate } from "@/types/associate";
 
 export function AssociateTable() {
   const { data: associates, isLoading, error } = useAssociates();
   const removeAssociate = useRemoveAssociate();
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingAssociate, setEditingAssociate] = useState<Associate | null>(
+    null
+  );
 
   if (isLoading) return <p className="text-base text-text/60">Carregando…</p>;
   if (error)
@@ -25,30 +28,20 @@ export function AssociateTable() {
     );
 
   return (
-    <table className="w-full text-left text-base">
-      <thead>
-        <tr className="rounded-md bg-accent/50">
-          <th className="rounded-l-md px-3 py-3 font-semibold">Nome</th>
-          <th className="px-3 py-3 font-semibold">Data de nascimento</th>
-          <th className="px-3 py-3 font-semibold">Nome da mãe</th>
-          <th className="px-3 py-3 font-semibold">Nome do pai</th>
-          <th className="px-3 py-3 font-semibold">Matrícula</th>
-          <th className="rounded-r-md px-3 py-3" />
-        </tr>
-      </thead>
-      <tbody>
-        {associates.map((associate: Associate) =>
-          editingId === associate.id ? (
-            <tr key={associate.id} className="border-b border-text/10">
-              <td colSpan={6} className="px-3 py-3">
-                <AssociateForm
-                  key={associate.id}
-                  associate={associate}
-                  onDone={() => setEditingId(null)}
-                />
-              </td>
-            </tr>
-          ) : (
+    <>
+      <table className="w-full text-left text-base">
+        <thead>
+          <tr className="rounded-md bg-accent/50">
+            <th className="rounded-l-md px-3 py-3 font-semibold">Nome</th>
+            <th className="px-3 py-3 font-semibold">Data de nascimento</th>
+            <th className="px-3 py-3 font-semibold">Nome da mãe</th>
+            <th className="px-3 py-3 font-semibold">Nome do pai</th>
+            <th className="px-3 py-3 font-semibold">Matrícula</th>
+            <th className="rounded-r-md px-3 py-3" />
+          </tr>
+        </thead>
+        <tbody>
+          {associates.map((associate: Associate) => (
             <tr key={associate.id} className="border-b border-text/10">
               <td className="px-3 py-3">{associate.name}</td>
               <td className="px-3 py-3">{formatDateBr(associate.birthDate)}</td>
@@ -58,7 +51,7 @@ export function AssociateTable() {
               <td className="px-3 py-3">
                 <div className="flex justify-end gap-2">
                   <button
-                    onClick={() => setEditingId(associate.id)}
+                    onClick={() => setEditingAssociate(associate)}
                     className="rounded-md bg-secondary px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-secondary/70"
                   >
                     Editar
@@ -72,9 +65,23 @@ export function AssociateTable() {
                 </div>
               </td>
             </tr>
-          )
+          ))}
+        </tbody>
+      </table>
+
+      <Modal
+        open={editingAssociate !== null}
+        onClose={() => setEditingAssociate(null)}
+        title="Editar associado"
+      >
+        {editingAssociate && (
+          <AssociateForm
+            key={editingAssociate.id}
+            associate={editingAssociate}
+            onDone={() => setEditingAssociate(null)}
+          />
         )}
-      </tbody>
-    </table>
+      </Modal>
+    </>
   );
 }
